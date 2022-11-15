@@ -12,4 +12,5 @@ def plot(X, y):
 def euclidean_distance(x1,x2):
     #TODO
     #calculates l2 distance between two vectors
-    return
+    l2 = np.linalg.norm(x1 - x2)
+    return l2
