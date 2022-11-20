@@ -4,6 +4,7 @@ import math
 
 from data import readDataLabels
 from utils import plot, euclidean_distance
+import matplotlib.pyplot as plt
 
 from sklearn.cluster import DBSCAN as sklearnDBSCAN     # Only jerks will use this in assignment!
 
@@ -11,9 +12,6 @@ from sklearn.cluster import DBSCAN as sklearnDBSCAN     # Only jerks will use th
 def test_sklearn(X):
     # Lets see how sklearn performs.
     db = sklearnDBSCAN(eps=0.2, min_samples=10).fit(X)
-    print("sklearn ===========")
-    print(db.labels_)
-    print("========================")
     plot(X, db.labels_)
 
 
@@ -28,6 +26,7 @@ class DBSCAN():
     def __init__(self, eps=1.0, min_samples=5):
         self.eps = eps
         self.min_samples = min_samples
+        self.missed = []
 
 
     def get_neighbors(self, sample_i): #TODO
@@ -35,8 +34,10 @@ class DBSCAN():
             A sample_a is considered a neighbor of sample_b if the distance 
             between them less than eps """
         neighbors = []
-        idxs = np.arange(len(self.X))
-        for i, sample in enumerate(self.X[idxs != sample_i]):
+        # idxs = np.arange(len(self.X) + 1)
+        for i, sample in enumerate(self.X):
+            if i == sample_i:
+                continue
             dist = euclidean_distance(self.X[sample_i], sample)
             if dist < self.eps:
                 neighbors.append(i)
@@ -56,8 +57,8 @@ class DBSCAN():
                 if(len(neighbors_of_ni) >= self.min_samples):
                     points = self.expand_cluster(neighbor_i, neighbors_of_ni)
                     cluster.extend(points)
-                
-                cluster.append(neighbor_i)
+                else:
+                    cluster.append(neighbor_i)
                 # Finish this function
                 # Hint:
                 # Fetch the sample's distant neighbors (neighbors of neighbor)
@@ -78,7 +79,6 @@ class DBSCAN():
             for i, cluster in enumerate(self.clusters):
                 if sample in cluster:
                     labels[sample] = i
-                    break
         return labels
 
 
@@ -109,16 +109,13 @@ class DBSCAN():
                 # Add cluster to list of clusters
                 self.clusters.append(new_cluster)
             # pass
-
-        print(self.clusters)
         cluster_labels = self.det_cluster_labels()
-        print(cluster_labels)
         return cluster_labels
 
 
 def main():
 
-    dbscan = DBSCAN() #add custom parameters for eps and min_samples
+    # dbscan = DBSCAN() #add custom parameters for eps and min_samples
 
     X,y = readDataLabels()
     plot(X, y)
@@ -136,12 +133,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-    
-
-
-
-
 
